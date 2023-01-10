@@ -14,7 +14,7 @@ time.sleep(5)
 mob_number = scraper.find_element('xpath','//*[@id="ap_email"]').send_keys('9920220422')
 continue_btn = scraper.find_element('xpath','//*[@id="continue"]').click()
 time.sleep(3)
-password = scraper.find_element('xpath','//*[@id="ap_password"]').send_keys('test@123')
+password = scraper.find_element('xpath','//*[@id="ap_password"]').send_keys('')
 log_in_btn = scraper.find_element('xpath','//*[@id="signInSubmit"]').click()
 time.sleep(3)
 

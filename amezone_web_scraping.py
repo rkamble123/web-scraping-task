@@ -8,10 +8,10 @@ scraper.get('https://www.amazon.in/ap/signin?openid.pape.max_auth_age=0&openid.r
 
 time.sleep(3)
 
-mob_number = scraper.find_element('xpath','//*[@id="ap_email"]').send_keys('')
+mob_number = scraper.find_element('xpath','//*[@id="ap_email"]').send_keys('') # Enter email or mobile number
 continue_btn = scraper.find_element('xpath','//*[@id="continue"]').click()
 time.sleep(3)
-password = scraper.find_element('xpath','//*[@id="ap_password"]').send_keys('')
+password = scraper.find_element('xpath','//*[@id="ap_password"]').send_keys('') # Enter password
 log_in_btn = scraper.find_element('xpath','//*[@id="signInSubmit"]').click()
 time.sleep(3)
 

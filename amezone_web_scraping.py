@@ -1,9 +1,6 @@
 from bs4 import BeautifulSoup
-import requests
 from selenium import webdriver
 import time
-
-from selenium.webdriver.common.keys import Keys
 
 scraper= webdriver.Chrome('./cromedriver.exe')
 
@@ -11,10 +8,10 @@ scraper.get('https://www.amazon.in/ap/signin?openid.pape.max_auth_age=0&openid.r
 
 time.sleep(3)
 
-mob_number = scraper.find_element('xpath','//*[@id="ap_email"]').send_keys('abc')
+mob_number = scraper.find_element('xpath','//*[@id="ap_email"]').send_keys('9920220422')
 continue_btn = scraper.find_element('xpath','//*[@id="continue"]').click()
 time.sleep(3)
-password = scraper.find_element('xpath','//*[@id="ap_password"]').send_keys('')
+password = scraper.find_element('xpath','//*[@id="ap_password"]').send_keys('test@123')
 log_in_btn = scraper.find_element('xpath','//*[@id="signInSubmit"]').click()
 time.sleep(3)
 
@@ -37,34 +34,35 @@ page_html  = scraper.page_source
 # print(page_source)
 
 soup = BeautifulSoup(page_html,'lxml')
-print(soup)
+# print(soup)
 
 
 year_list = soup.find('ul',class_ = 'a-nostyle a-list-link')
-print(year_list)
+# print(year_list)
 year_list = year_list.find_all('li',class_='a-dropdown-item')
-print(year_list)
-print(len(year_list))
+# print(year_list)
+# print(len(year_list))
 
 final_yesr_list =[]
 for i in year_list:
-    print(i)
+    # print(i)
     if 'Archived Orders' not in str(i):
         final_yesr_list.append(i)
 
-print(len(final_yesr_list))
+# print(len(final_yesr_list))
 
 # time.sleep(3)
 # scraper.get(required_url)
 # time.sleep(3)
 
 data_dict = {}
+data_found_dict = {}
 
 for year_data in final_yesr_list :
-    print(type(year_data))
+    # print(type(year_data))
     year_no=year_data.text
-    print(year_no)
-    print(type(year_no))
+    # print(year_no)
+    # print(type(year_no))
     yesr_no=year_no.replace('\n','')
     year_no= year_no.strip()
     if year_no == 'last 30 days':
@@ -75,30 +73,61 @@ for year_data in final_yesr_list :
         year_no= f'year-{year_no}'
 
     path = fr'https://www.amazon.in/gp/your-account/order-history?opt=ab&digitalOrders=1&unifiedOrders=1&returnTo=&orderFilter={year_no}'
-    print(path)
+    # print(path)
 
     scraper.get(path)
     time.sleep(2)
 
     order_container = scraper.find_element('xpath','//*[@id="ordersContainer"]').text
-    print(order_container)
+    # print(order_container)
     if 'You have not placed any orders' in order_container:
         data_dict[year_no] = 'No Data'
         pass
     else: 
         # scraper.find_element
+        product_name = scraper.find_element('xpath','//*[@id="ordersContainer"]/div[2]/div[2]/div/div[2]/div/div[1]/div/div/div/div[2]/div[1]').text
+
+        time.sleep(2)
+
+        scraper.find_element('xpath', '//*[@id="ordersContainer"]/div[2]/div[1]/div/div/div/div[2]/div[2]/ul/a').click()
+
+        order_id=scraper.find_element('xpath','//*[@id="orderDetails"]/div[2]/div[1]/div/span[2]').text
+        # print(product_name)
+        order_id = order_id.replace('\n','')
+        order_id = order_id.replace('Order#','')
+        # print('order_id',order_id)
+        order_shiping_address = scraper.find_element('xpath','//*[@id="orderDetails"]/div[4]/div/div/div/div[1]/div/div[1]/div[1]').text
+        order_shiping_address = order_shiping_address.replace('\n',' ')
+        order_shiping_address = order_shiping_address.replace("Shipping Address",'')
+        # print('order_shiping_address', order_shiping_address)
+        payment_method = scraper.find_element('xpath','//*[@id="orderDetails"]/div[4]/div[1]/div/div/div/div[1]/div/div[2]/div[1]/div').text
+        payment_method = payment_method.replace('\n','')
+        payment_method = payment_method.replace('Payment Method','')
+        # print('payment_method', payment_method)
+        order_summery = scraper.find_element('xpath','//*[@id="od-subtotals"]').text
+        order_summery = order_summery.replace('\n',',')
+        order_summery = order_summery.replace('Order Summary','')
+        # print('order_summery', order_summery)
+
+
+        product_dict= {
+            'product_name':product_name,
+            'order_id':order_id,
+            'Shiping_address':order_shiping_address,
+            'Payment_method':payment_method,
+            'order_summary':order_summery
+        }
+
+        data_found_dict[product_name] = product_dict
+        print()
+        print(data_found_dict)
+
         time.sleep(2)
         break
 
-    
-    # scraper.get(required_url)
-    # select_year = scraper.find_element('xpath','//*[@id="a-autoid-1-announce"]').click()
-    # time.sleep(3)
-    # year_element = scraper.find_element('xpath',f'//*[@id="a-popover-1"]/div/div/ul/li[{year_no+1}]').click()
-    # time.sleep(3)
-    # scraper.page_source
+# print(data_found_dict)
 
     # break
 time.sleep(3)
-print(data_dict)
+# print(data_dict)
 
